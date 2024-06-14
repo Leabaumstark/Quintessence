@@ -35,13 +35,9 @@ def speech_to_text(mp3file, textfile):
     with open(textfile, 'a') as f:
         f.write(transcription.text + ' ')
     audio_file.close()
-        
 
-def summarize_text(textfile, output_file):
-    # Read content of textfile into string to later use as prompt
-    with open(textfile, 'r') as f:
-        transcript = f.read()
 
+def promptGPT(transcript):
     # Prompt the model to summarize the text
     client = OpenAI()
     response = client.chat.completions.create(
@@ -51,18 +47,39 @@ def summarize_text(textfile, output_file):
             {"role": "user", "content": "Ich bin Student und habe die Vorlesung, von der das folgende Transkript stammt, verpasst. Könntest du mir eine Stichpunktartige, aber ausführliche Zusammenfassung von den vermittelten Inhalten und Konzepten erstellen, die ich als einzige Quelle nutzen kann um mich auf die Klausur vorzubereiten? Bitte formatiere deine Antwort mit Markdown und schließe die Zusammenfassung mit dem Punkt \"Organisatorisches\" ab, unter welchem du Inhalte des Transkripts nennst, die nicht unmittelbar mit der Vorlesungsthematik zu tun haben. Hier das Transkript: " + transcript}
         ]
     )
+    return response
+        
 
-    # for each choice in the response, save the summary to a file
-    for i in range(len(response.choices)):
+def summarize_text(textfile, output_file):
+    # Read content of textfile into string to later use as prompt
+    with open(textfile, 'r') as f:
+        transcript = f.read()
 
-        # Print to console for debugging and verification
-        print(f"Choice {i+1}:")
-        print(response.choices[i].message.content)
-        print()
+    
+    # check if summary is too long (more than ~50000 chars)
+    # if it is, split the summary into multiple files
+    # and process each separately
+    if len(transcript) >= 50000:
+        # Split transcript into 20000 char chunks
+        transcript_chunks = [transcript[i:i+40000] for i in range(0, len(transcript), 40000)]
+        for i, chunk in enumerate(transcript_chunks):
+            print(f"Processing transcript chunk {i}")
+            response = promptGPT(chunk)
+            
+            # append first choice of response to output file
+            with open(output_file, 'a') as f:
+                f.write("\n\n")
+                f.write("-------------------------------------------------------------\n")
+                f.write("Zusammenfassung Teil " + str(i+1) + "\n")
+                f.write("-------------------------------------------------------------\n\n")
 
-        with open(f"{output_file.replace('.txt', '')}_{i}.txt", 'w') as f:
-            f.write(response.choices[i].message.content)
+                f.write(response.choices[0].message.content + ' ')
 
+    else:
+        response = promptGPT(transcript) 
+        # append first choice of response to output file
+        with open(output_file, 'a') as f:
+            f.write(response.choices[0].message.content + ' ')
 
 
 
@@ -110,6 +127,7 @@ def main():
     # remove mp3 file after processing
     os.remove(mp3file)
 
+    # Summarize the transcript
     summarize_text(args.transcript_file, args.summ_file)
 
 if __name__ == '__main__':
