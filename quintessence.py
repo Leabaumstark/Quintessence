@@ -41,7 +41,7 @@ def promptGPT(transcript):
     # Prompt the model to summarize the text
     client = OpenAI()
     response = client.chat.completions.create(
-        model="gpt-3.5-turbo",
+        model="gpt-4o-mini",
         messages=[
             {"role": "system", "content": "Du bist ein hilfreicher Assistent."},
             {"role": "user", "content": "Ich bin Student und habe die Vorlesung, von der das folgende Transkript stammt, verpasst. Könntest du mir eine Stichpunktartige, aber ausführliche Zusammenfassung von den vermittelten Inhalten und Konzepten erstellen, die ich als einzige Quelle nutzen kann um mich auf die Klausur vorzubereiten? Bitte formatiere deine Antwort mit Markdown und schließe die Zusammenfassung mit dem Punkt \"Organisatorisches\" ab, unter welchem du Inhalte des Transkripts nennst, die nicht unmittelbar mit der Vorlesungsthematik zu tun haben. Hier das Transkript: " + transcript}
