@@ -23,6 +23,8 @@ def speech_to_text(mp3file, textfile):
         prevTranscript = f.read()
 
     # Transcribe audio file
+    print(f"Transcribing {mp3file}...")
+
     client = OpenAI()
     audio_file = open(mp3file, 'rb')
     transcription = client.audio.transcriptions.create(
@@ -35,6 +37,8 @@ def speech_to_text(mp3file, textfile):
     with open(textfile, 'a') as f:
         f.write(transcription.text + ' ')
     audio_file.close()
+
+    print(f"Transcription of {mp3file} complete.")
 
 
 def promptGPT(transcript):
@@ -70,12 +74,14 @@ def summarize_text(textfile, output_file):
             with open(output_file, 'a') as f:
                 f.write("\n\n")
                 f.write("-------------------------------------------------------------\n")
-                f.write("Zusammenfassung Teil " + str(i+1) + "\n")
+                f.write("Summary pt.  " + str(i+1) + "\n")
                 f.write("-------------------------------------------------------------\n\n")
 
                 f.write(response.choices[0].message.content + ' ')
 
     else:
+        # If transcript is not too long, process it directly
+        print(f"Processing transcript")
         response = promptGPT(transcript) 
         # append first choice of response to output file
         with open(output_file, 'a') as f:
@@ -84,10 +90,10 @@ def summarize_text(textfile, output_file):
 
 
 def main():
-    parser = argparse.ArgumentParser(description='Quintessence - Convert video to text')
+    parser = argparse.ArgumentParser(description='Quintessence - Summarize lecture videos')
     parser.add_argument('-i', dest='video_file', help='input file, has to be mp4 video file', required=True)
-    parser.add_argument('-t', dest='transcript_file', help='transcript output file name', required=True)
-    parser.add_argument('-o', dest='summ_file', help='output summary file name', required=True)
+    parser.add_argument('-t', dest='transcript_file', help='transcript output file name', required=False, default='transcript.txt')
+    parser.add_argument('-o', dest='summ_file', help='output summary file name', required=False, default='summary.txt')
     args = parser.parse_args()
 
     # Check all arguments for right suffix
