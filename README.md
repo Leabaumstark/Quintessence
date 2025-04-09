@@ -2,7 +2,7 @@
 Python tool to summarize lecture videos
 
 ## Limitations
-Currently only works with german language. 
+Currently only returns summaries in german. 
 
 ## Prerequisites
 For the OpenAI API requests to work, you need to add your personal OpenAI API key to your environment variables.
