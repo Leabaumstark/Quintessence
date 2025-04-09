@@ -12,8 +12,6 @@ You also have to enable billing and make sure, that your OpenAI credit balance i
 
 The OpenAI API requests done by this script **cost money**. Usually it's <50ct. You will, however, have to add billing information to your OpenAI account. Please get informed about the conditions, I do not take responsibility for any amount of money OpenAI will charge you. 
 
-Also, the following python packages are required:
-- moviepy
-- openai
-- argparse
-- pydub
+**Note:**
+
+This script was written before chatGPT also directly took mp4 files as an input. Using chatGPT directly for this purpose may be beneficial now regarding pricing.
